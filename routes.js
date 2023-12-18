@@ -39,4 +39,8 @@ serverRouter.post("/login", function (request, response) {
     });
 });
 
+serverRouter.get("/mapApiKey", function (request, response) {  
+    response.json({mapApiKey: process.env.MAP_API_KEY});
+});
+
 module.exports = serverRouter; 
