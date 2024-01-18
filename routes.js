@@ -2,8 +2,12 @@ const express = require("express");
 const { body, validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
 const mongodb = require("./mongodb");
+<<<<<<< HEAD
 const { User, signUpUserChain } = require("./models/User");
 
+=======
+const Station = require("./models/Station")
+>>>>>>> f66166f (dodao rutu za dodavanje radiostanice)
 // Backend endpoints are defined in express.Router
 const serverRouter = express.Router();
 
@@ -83,11 +87,31 @@ serverRouter.get("/mapApiKey", function (request, response) {
     response.json({mapApiKey: process.env.MAP_API_KEY});
 });
 
-serverRouter.get("/radioStations", async function (request, response) {
-    const radioCollection = mongodb.getRadioCollection();
-    const radioStations = await radioCollection.find({}).toArray();
-    
-    return response.json({ radioStations: radioStations });
-});
+serverRouter.get("/stations", async function(request,response) {
+    console.log("u f-iji")
+    const station = await Station.find()
+    response.json(station)
+})
+
+serverRouter.post("/stations", async function(request,response) {
+    console.log("u stations postu sam", request.body.name)
+
+	const station = new Station({
+        ...request.body,        
+	})
+	await station.save()
+
+    response.send(station)
+})
+
+
+
+
 
 module.exports = serverRouter; 
+
+// seederr pozove radio browser -> dobije podatke nazaddddddddd o xyz stanica
+// nakon toga seeder poziva APi naseg servera da te stanice doda u nas sustav
+// nas server koji implementira nas API dodaje te te podatke u Mongodb
+// konacno react client poziva nas API da dobije podatke o radio staniiiicama
+// nas server ce pogledati u mongodb i vratiti podatke koje tamo nadje
