@@ -106,6 +106,21 @@ serverRouter.get("/stations/:id", async (req, res) => {
 	res.send(station)
 })
 
+serverRouter.put("/stations/:id",async ( request,response)=>{
+    let stationId
+    try{
+    stationId=new ObjectId(request.params.id)
+    } catch(e){
+        console.log("object id exception", e)
+        return response.status(404).json({error: "stationId invalid"})
+    }
+    const station = await Station.findOneAndUpdate({ _id: stationId } ,request.body)
+    if(station === null){
+        return response.status(404).json({error: "station not found"})
+    }
+    response.send(station)
+})
+
 serverRouter.post("/stations", async function(request,response) {
     console.log("u stations postu sam", request.body.name)
 
