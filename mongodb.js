@@ -31,5 +31,9 @@ module.exports = {
 
     getUsersCollection: function() {
         return mongoClient.db("radio-odyssey-database").collection("Users");
+    },
+
+    getRadioCollection: function() {
+        return mongoClient.db("radio-odyssey-database").collection("stations");
     }
 }
