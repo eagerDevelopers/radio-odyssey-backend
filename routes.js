@@ -2,12 +2,9 @@ const express = require("express");
 const { body, validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
 const mongodb = require("./mongodb");
-<<<<<<< HEAD
 const { User, signUpUserChain } = require("./models/User");
-
-=======
+const { ObjectId } = require('mongodb');
 const Station = require("./models/Station")
->>>>>>> f66166f (dodao rutu za dodavanje radiostanice)
 // Backend endpoints are defined in express.Router
 const serverRouter = express.Router();
 
@@ -91,6 +88,22 @@ serverRouter.get("/stations", async function(request,response) {
     console.log("u f-iji")
     const station = await Station.find()
     response.json(station)
+})
+
+serverRouter.get("/stations/:id", async (req, res) => {
+    let stationId
+    try {
+        stationId = new ObjectId(req.params.id)
+    } catch (e) {
+        console.log("object id exception", e)
+        return res.status(404).json({error: "stationId invalid"})
+    }
+
+	const station = await Station.findOne({ _id: stationId })
+    if (station === null) {
+        return res.status(404).json({error: "station not found"})
+    }
+	res.send(station)
 })
 
 serverRouter.post("/stations", async function(request,response) {
