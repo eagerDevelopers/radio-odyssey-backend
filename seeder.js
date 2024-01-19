@@ -86,7 +86,7 @@ async function updateStation(station, ourId){
     const response = await axios.put('http://localhost:5001/stations/'+ourId, station);
   } catch (error) {
     
-    console.error('Error in update station:', station, error);
+    console.error('Error in update station:', station);
   }
 }
 
@@ -99,7 +99,9 @@ async function insertStation(station){
 }
 
 async function updateOurServer(stanice, stationsByRadioBrowserId) {
-  stanice.forEach( async stanica => {
+  const kolikoStanica = stanice.length
+  for (let i=0; i<kolikoStanica; i++) {
+    const stanica = stanice[i]
     const radioBrowserId = stanica.stationuuid
     const stanicaModified = {...stanica, 
                               lat: stanica.geo_lat,
@@ -113,7 +115,7 @@ async function updateOurServer(stanice, stationsByRadioBrowserId) {
     } else {
       await insertStation(stanicaModified)
     }
-  })
+  }
 }
 
 
