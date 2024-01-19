@@ -11,7 +11,7 @@ const port = process.env.PORT || 5000;
 const dbUri = process.env.DB_URI;
 
 mongoose
-	.connect(dbUri, { useNewUrlParser: true, dbName: 'radio-odyssey-database' })
+	.connect(dbUri, {  dbName: 'radio-odyssey-database' })
 	.then(() => {
         console.log("Mongoose connected!")
         const app = express();
