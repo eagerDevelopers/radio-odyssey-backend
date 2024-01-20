@@ -1,19 +1,41 @@
-const { body } = require("express-validator");
+const {mongoose } = require("mongoose");
 
-function User(username, passwod, firstName, lastName, email) {
-    this.username = username;
-    this.password = passwod;
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.email = email
-}
+const userSchema = new mongoose.Schema({
+    username: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    password: {
+        type: String,
+        required: true,
+    },
+    firstName: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    lastName: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    email: {
+        type: String,
+        required: true,
+        trim: true,
+    }
+});
 
-const signUpUserChain = () => [
-    body("username").notEmpty(),
-    body("password").isString().notEmpty(),
-    body("firstName").isString().notEmpty(),
-    body("lastName").isString().notEmpty(),
-    body("email").isEmail().notEmpty(),
-];
+userSchema.statics.findByUsernameOrEmail = function(username, email) {
+    return this.find(
+        {$or: [
+            {username: username},
+            {email: email}
+        ]}
+    );
+};
 
-module.exports = { User, signUpUserChain }; 
+const User = mongoose.model("User", userSchema, "Users");
+
+module.exports = User;
