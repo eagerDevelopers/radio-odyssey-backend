@@ -84,11 +84,12 @@ serverRouter.get("/mapApiKey", function (request, response) {
     response.json({mapApiKey: process.env.MAP_API_KEY});
 });
 
-serverRouter.get("/stations", async function(request,response) {
-    console.log("u f-iji")
-    const station = await Station.find()
-    response.json(station)
-})
+serverRouter.get("/radioStations", async function (request, response) {
+    const radioCollection = mongodb.getRadioCollection();
+    const radioStations = await radioCollection.find({}).toArray();
+
+    return response.json({ radioStations: radioStations });
+});
 
 serverRouter.get("/stations/:id", async (req, res) => {
     let stationId
