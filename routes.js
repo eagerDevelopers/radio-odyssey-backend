@@ -16,10 +16,14 @@ serverRouter.get("/mapApiKey", function (request, response) {
 });
 
 serverRouter.get("/radioStations", async function (request, response) {
-    const radioCollection = mongodb.getRadioCollection();
-    const radioStations = await radioCollection.find({}).toArray();
+    try {
+        console.log("u f-iji")
+        const station = await Station.find()
+        response.json(station)
+    } catch (error) {
+        console.log(error);
+    }
 
-    return response.json({ radioStations: radioStations });
 });
 
 serverRouter.get("/stations/:id", async (req, res) => {
