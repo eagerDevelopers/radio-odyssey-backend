@@ -6,7 +6,7 @@ const signup = async function (request, response) {
     try {
         const existingUsers = await User.findByUsernameOrEmail(request.body.username, request.body.email);
         if (existingUsers.length != 0) {
-            return response.status(401).json({ message: "User already defined in database" });
+            return response.status(401).json({ userAuthenticated: false, message: "User already defined in database" });
         }
 
         const salt = bcrypt.genSaltSync(10);
@@ -22,13 +22,9 @@ const signup = async function (request, response) {
         await user.save();
 
         const token = createSecretToken(user._id);
-        response.cookie("token", token, {
-            withCredentials: true,
-            httpOnly: false,
-        });
-        return response.status(200).json({ message: "User successfully signed up"});
+        return response.status(200).json({ userAuthenticated: true, message: "User successfully signed up", token: token, username: user.username});
     } catch (error) {
-        response.status(500).json({ message: "Error during signup: " + error });
+        response.status(500).json({ userAuthenticated: false, message: "Error during signup: " + error });
     }    
 }
 
@@ -45,12 +41,8 @@ const login = async function (request, response) {
         }
 
         const token = createSecretToken(user._id);
-        response.cookie("token", token, {
-            withCredentials: true,
-            httpOnly: false,
-        });
 
-        return response.status(200).json({ userAuthenticated: true, message: "User successfully signed in"});
+        return response.status(200).json({ userAuthenticated: true, message: "User successfully signed in", token: token, username: user.username});
     } catch (error) {
         return response.status(500).json({ userAuthenticated: false, message: "Error during login: " + error });
     }
