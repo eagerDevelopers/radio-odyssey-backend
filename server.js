@@ -1,44 +1,39 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-
-const mongodb = require("./mongodb");
 const mongoose = require("mongoose") 
-
+const cookieParser = require("cookie-parser");
 var serverRouter = require("./routes");
 
-const port = process.env.PORT || 5000;
-const dbUri = process.env.DB_URI;
+const PORT = process.env.PORT || 5000;
+const DB_URI = process.env.DB_URI;
+const DB_NAME = process.env.DB_NAME;
 
-mongoose
-	.connect(dbUri, {  dbName: 'radio-odyssey-database' })
-	.then(() => {
-        console.log("Mongoose connected!")
-        const app = express();
-        app.use(cors());
-        app.use(express.json());
-        // Configure server with endpoints defined in routes.js with base url "/"
-        app.use("/", serverRouter);
-        
-        app.listen(port, () => {
-            console.log(`Backend server is running on port: ${port}`);
-            mongodb.connectToMongoCluster().catch(console.dir);
-        
-            // console.log("Fetching user eagerdeveloper...");
-        
-            // let usersCollection = mongodb.getMongoClient().db("radio-odyssey-database").collection("Users");
-            // usersCollection
-            //     .findOne({username: "eagerdeveloper"})
-            //     .then((result) => {
-            //     console.log("Fetched user successfully!");
-            //         console.log(result);
-            //     })
-            //     .catch((err) => {
-            //         console.error(err);
-            //     });
-        
-        })	
-    })
-    .catch(ex => {console.log("mongoose failed to connect:", ex)})
+const app = express();
+app.use(cors());
+app.use(cookieParser());
+app.use(express.json());
+
+app.use("/", serverRouter);
+
+app.listen(PORT, () => {
+    console.log(`Backend server is running on port: ${PORT}`);
+    console.log(`Connecting to ${DB_NAME} using mongoose...`);
+    mongoose.connect(DB_URI, { dbName: DB_NAME })
+        .then(() => {
+            console.log(`Successfully connected to ${DB_NAME}`);
+        })
+        .catch(error => {
+            console.log("Error occured while connecting to database: " + error);
+        });
+
+    mongoose.connection.on("error", error => {
+        console.log("Error occured with database connection: " + error);
+    });
+    mongoose.connection.on("disconnected", msg => {
+        console.log("Database connection broken: " + msg);
+    });
+
+});
 
 

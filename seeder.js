@@ -47,14 +47,16 @@ async function fetchStationsForCountry(countryCode) {
   }
 }
 
-function filterStationsWithCoordinates(stations) {
+function filterStations(stations) {
+  const SUPPORTED_CODECS = ["aac", "AAC", "aac+", "AAC+", "mp3", "MP3"];
+
   return stations.filter(station => {
     return (
       station.geo_lat 
       && station.geo_long
       && station.name
       && station.stationuuid
-      && station.codec
+      && SUPPORTED_CODECS.includes(station.codec)
       && station.url
     )
   })
@@ -64,11 +66,11 @@ function mergeStations(countryStations, allStations) {
   return allStations.concat(countryStations);
 }
 
-async function saveStationsToFile(stations) {
+async function saveStationsToFile(stations, filename) {
   try {
     const jsonString = JSON.stringify(stations, null, 2);
-    fs.writeFileSync('stations.json', jsonString);
-    console.log('Stations saved to stations.json');
+    fs.writeFileSync(`${filename}.json`, jsonString);
+    console.log(`Stations saved to ${filename}.json`);
   } catch (error) {
     console.error('Error saving stations to file:', error.message);
     throw error;
@@ -128,7 +130,7 @@ async function main() {
     let allStations = [];
     for (const country of countries) {
       const countryStations = await fetchStationsForCountry(country.iso_3166_1);
-      const filteredStations = filterStationsWithCoordinates(countryStations);
+      const filteredStations = filterStations(countryStations);
       const limitirane = limitStations(filteredStations, 15);
       updateOurServer(limitirane, stationsByRadioBrowserId)
       allStations = mergeStations(limitirane, allStations);
